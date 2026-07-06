@@ -1,0 +1,9 @@
+Release notes
+
+Version 1.4.0 added Excel worksheet indexing, source-only mode, and a compact floating widget for website embedding.
+
+Version 1.3.0 added hot reload for the document index and a knowledge-base debug panel for staging environments.
+
+Version 1.2.0 added PDF and Word parsing, improved Chinese/Japanese/Korean tokenization, and better source labels.
+
+Version 1.1.0 added SSE streaming responses and webhook signing examples.

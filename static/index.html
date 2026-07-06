@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northwind Docs Hub</title>
+<meta name="description" content="Sample product knowledge base with document search, citations, and an embeddable chat widget.">
+<meta name="theme-color" content="#0f6b54">
+<link rel="canonical" href="https://bot.xyh.wiki/">
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="icon" type="image/x-icon" sizes="48x48" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Northwind Docs Hub">
+<meta property="og:description" content="Sample product knowledge base with document search, citations, and an embeddable chat widget.">
+<meta property="og:url" content="https://bot.xyh.wiki/">
+<meta property="og:image" content="https://bot.xyh.wiki/static/apple-touch-icon.png">
+<meta name="twitter:card" content="summary">
+<style>
+  html, body { min-height: 100%; }
+  body {
+    margin: 0;
+    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    background: #f6f7f9;
+    color: #1f2430;
+  }
+  .page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 32px 20px;
+  }
+  .intro {
+    width: min(680px, 100%);
+  }
+  .intro h1 {
+    margin: 0 0 10px;
+    font-size: clamp(26px, 5vw, 42px);
+    line-height: 1.12;
+    font-weight: 700;
+  }
+  .intro p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <section class="intro" aria-label="Assistant">
+    <h1 id="page-title">Northwind Docs Hub</h1>
+    <p id="page-tagline">Search a sample product knowledge base with citations.</p>
+  </section>
+</main>
+<noscript><p style="padding:16px 22px">This page requires JavaScript. Please enable it and reload.</p></noscript>
+<script>
+fetch("/api/config").then(r => r.json()).then(cfg => {
+  document.title = cfg.name;
+  document.documentElement.lang = cfg.lang || "en";
+  document.getElementById("page-title").textContent = cfg.name;
+  document.getElementById("page-tagline").textContent = cfg.tagline;
+}).catch(() => {});
+</script>
+<script src="/static/widget.js?v=60027d6"></script>
+</body>
+</html>

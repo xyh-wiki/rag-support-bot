@@ -1,0 +1,16 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# docs/ is your live knowledge base — only ship the sample KB in the repo,
+# never customer/business documents
+docs/*
+!docs/billing.md
+!docs/getting-started.md
+!docs/troubleshooting.md
+!docs/api-reference.md
+
+# deployment-specific knowledge base and prompt (never public)
+kb/
+prompt.*.txt
