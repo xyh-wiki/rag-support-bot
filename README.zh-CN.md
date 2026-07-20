@@ -149,14 +149,6 @@ node --check static/widget.js
 - `docker-compose.yml`
 - `.dockerignore`
 
-## GitHub Topics
-
-建议添加:
-
-`knowledge-base`, `document-qa`, `question-answering`, `rag`, `fastapi`,
-`bm25`, `self-hosted`, `chat-widget`, `sse`, `pdf`, `docx`, `xlsx`, `html`,
-`openai-compatible`, `python`
-
 ## 许可证
 
 MIT

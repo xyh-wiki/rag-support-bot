@@ -156,14 +156,6 @@ Docker files are included for deployment:
 - `docker-compose.yml`
 - `.dockerignore`
 
-## Repository Topics
-
-Suggested GitHub topics:
-
-`knowledge-base`, `document-qa`, `question-answering`, `rag`, `fastapi`,
-`bm25`, `self-hosted`, `chat-widget`, `sse`, `pdf`, `docx`, `xlsx`, `html`,
-`openai-compatible`, `python`
-
 ## License
 
 MIT
