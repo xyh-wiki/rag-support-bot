@@ -69,6 +69,7 @@ docker compose up --build
 | `DOCS_DIR` | 知识库目录 | `docs/` |
 | `SYSTEM_PROMPT_FILE` | 自定义系统提示词文件 | 内置提示词 |
 | `SHOW_KB_PANEL` | 是否在页面显示已加载文档 | `false` |
+| `SHOW_SOURCES` | 是否发送并展示文档来源，同时要求模型附带引用 | `true` |
 | `ALLOWED_ORIGINS` | 允许跨域调用的来源,逗号分隔 | 仅同源 |
 
 ## 嵌入网页

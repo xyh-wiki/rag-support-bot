@@ -71,6 +71,7 @@ synthesize an answer.
 | `DOCS_DIR` | Knowledge-base directory | `docs/` |
 | `SYSTEM_PROMPT_FILE` | Path to a custom system prompt | built-in prompt |
 | `SHOW_KB_PANEL` | Show loaded documents in the UI | `false` |
+| `SHOW_SOURCES` | Send and display document source labels and ask the model for citations | `true` |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins | same-origin only |
 
 ## Embed the Widget
