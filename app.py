@@ -124,6 +124,17 @@ def _sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
+def _stream_delta_content(event) -> str | None:
+    """Read text from OpenAI-compatible stream events, including providers
+    that emit usage/final chunks with a null delta."""
+    choices = getattr(event, "choices", None)
+    if not choices:
+        return None
+    delta = getattr(choices[0], "delta", None)
+    content = getattr(delta, "content", None) if delta is not None else None
+    return content if isinstance(content, str) and content else None
+
+
 def _source_only_answer(hits) -> str:
     """Return useful results when no completion API key is configured."""
     if not hits:
@@ -267,7 +278,7 @@ def chat(req: ChatRequest, request: Request):
                 stream=True,
             )
             for event in stream:
-                if event.choices and (delta := event.choices[0].delta.content):
+                if delta := _stream_delta_content(event):
                     yield _sse("token", {"text": delta})
         except openai.OpenAIError as e:
             yield _sse("error", {"message": f"Completion API error: {e}"})

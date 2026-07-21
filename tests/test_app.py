@@ -2,10 +2,11 @@
 
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app import _source_only_answer
+from app import _source_only_answer, _stream_delta_content
 from rag.ingest import Chunk
 
 
@@ -25,3 +26,15 @@ def test_source_only_answer_returns_markdown_sources():
 
 def test_source_only_answer_handles_no_hits():
     assert "No matching source excerpts" in _source_only_answer([])
+
+
+def test_stream_delta_content_ignores_usage_chunk_without_delta():
+    event = SimpleNamespace(choices=[SimpleNamespace(delta=None)])
+
+    assert _stream_delta_content(event) is None
+
+
+def test_stream_delta_content_returns_text():
+    event = SimpleNamespace(choices=[SimpleNamespace(delta=SimpleNamespace(content="回答"))])
+
+    assert _stream_delta_content(event) == "回答"
