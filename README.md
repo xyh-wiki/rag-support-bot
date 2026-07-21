@@ -93,28 +93,26 @@ export ALLOWED_ORIGINS=https://your-site.com
 
 ### Content Security Policy (CSP)
 
-The widget renders its isolated UI in a Shadow DOM and currently installs its
-component styles with an inline `<style>` element. A host site with a strict CSP
-must therefore allow the widget script, API connections, and inline component
-styles. If the bot is exposed through a same-origin reverse proxy such as
-`/support-bot/`, a minimal compatible policy is:
+The widget renders its isolated UI in a Shadow DOM and loads `widget.css` as a
+separate asset. If the bot is exposed through a same-origin reverse proxy such
+as `/support-bot/`, a minimal policy is:
 
 ```http
-Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'
+Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self'
 ```
 
-For a cross-origin deployment, also allow the bot origin in `script-src` and
-`connect-src`, and configure `ALLOWED_ORIGINS` on the bot:
+For a cross-origin deployment, allow the bot origin in `script-src`,
+`connect-src`, and `style-src`, then configure `ALLOWED_ORIGINS` on the bot:
 
 ```http
-Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.example.com; connect-src 'self' https://bot.example.com; style-src 'self' 'unsafe-inline'
+Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.example.com; connect-src 'self' https://bot.example.com; style-src 'self' https://bot.example.com
 ```
 
-Keep `script-src` restricted to trusted origins. The widget does not require
-`'unsafe-inline'` for scripts.
+Keep all directives restricted to trusted origins. The widget does not require
+`'unsafe-inline'` for scripts or styles.
 
 If the launcher is missing from the bottom-right corner, check the browser
-console for a `style-src` CSP violation, confirm that `widget.js` and
+console for CSP or CORS violations, confirm that `widget.js`, `widget.css`, and
 `/api/config` return HTTP 200, and hard-refresh the host page after deployment.
 
 See `examples/embed.html` for a minimal host page.
@@ -132,7 +130,7 @@ See `examples/embed.html` for a minimal host page.
 
 The response is an SSE stream:
 
-- `sources`: list of source labels
+- `sources`: list of source labels when `SHOW_SOURCES=true`
 - `token`: streamed answer text
 - `done`: end of stream
 
@@ -164,17 +162,38 @@ More notes: `docs-public/use-cases.md`.
    the background when files change.
 4. `app.py` retrieves the top matching chunks for each question, adds them to
    the prompt, and streams the generated answer.
-5. `static/widget.js` renders the floating browser widget and consumes the SSE
-   stream.
+5. `static/widget.js` and `static/widget.css` render the floating browser widget
+   and consume the SSE stream.
 
 For larger corpora, the retriever can be replaced with a vector search backend
 without changing the ingestion or HTTP layers.
+
+## Production Updates
+
+Keep the source checkout, runtime deployment, and knowledge-base documents in
+separate directories. For each release:
+
+1. Pull the reviewed source revision and install dependencies in the service's
+   virtual environment.
+2. Synchronize application and static assets, including both `widget.js` and
+   `widget.css`.
+3. Restart the service, then verify `/api/health`, `/api/config`, the two widget
+   assets, and one real chat request through the public reverse proxy.
+4. Hard-refresh the host site so cached widget assets cannot hide a bad rollout.
+
+Treat the configured `DOCS_DIR` as the canonical knowledge base. Add or replace
+documents there instead of editing generated index data. The service detects
+document fingerprints and rebuilds the in-memory index automatically; verify a
+changed fact with a real question after every documentation update. Keep
+product-version details in the documents themselves and update or remove stale
+pages during each product release.
 
 ## Development
 
 ```bash
 python3 -m pytest tests/ -q
 node --check static/widget.js
+python3 -m pytest tests/test_widget_assets.py -q
 ```
 
 Docker files are included for deployment:

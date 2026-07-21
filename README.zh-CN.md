@@ -91,26 +91,24 @@ export ALLOWED_ORIGINS=https://your-site.com
 
 ### 内容安全策略（CSP）
 
-挂件使用 Shadow DOM 隔离界面，并通过内联 `<style>` 元素加载组件样式。因此，启用严格
-CSP 的宿主网站需要同时允许挂件脚本、接口连接和内联组件样式。如果通过
-`/support-bot/` 等路径做同源反向代理，可使用以下最小兼容策略：
+挂件使用 Shadow DOM 隔离界面，并通过独立的 `widget.css` 加载组件样式。如果通过
+`/support-bot/` 等路径做同源反向代理，可使用以下最小策略：
 
 ```http
-Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'
+Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self'
 ```
 
-跨域部署时，还需要在 `script-src` 和 `connect-src` 中允许机器人域名，并在机器人服务中
-配置 `ALLOWED_ORIGINS`：
+跨域部署时，需要在 `script-src`、`connect-src` 和 `style-src` 中允许机器人域名，并在
+机器人服务中配置 `ALLOWED_ORIGINS`：
 
 ```http
-Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.example.com; connect-src 'self' https://bot.example.com; style-src 'self' 'unsafe-inline'
+Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.example.com; connect-src 'self' https://bot.example.com; style-src 'self' https://bot.example.com
 ```
 
-应继续把 `script-src` 限制在可信来源。挂件脚本不需要开启脚本级别的
-`'unsafe-inline'`。
+所有指令都应限制在可信来源。挂件的脚本和样式均不需要开启 `'unsafe-inline'`。
 
-如果右下角没有出现机器人按钮，请检查浏览器控制台是否存在 `style-src` CSP 拒绝，确认
-`widget.js` 和 `/api/config` 均返回 HTTP 200，并在部署后强制刷新宿主页面。
+如果右下角没有出现机器人按钮，请检查浏览器控制台是否存在 CSP 或 CORS 拒绝，确认
+`widget.js`、`widget.css` 和 `/api/config` 均返回 HTTP 200，并在部署后强制刷新宿主页面。
 
 最小嵌入示例见 `examples/embed.html`。
 
@@ -127,7 +125,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.examp
 
 响应是 SSE 流:
 
-- `sources`:来源列表
+- `sources`:来源列表，仅在 `SHOW_SOURCES=true` 时发送
 - `token`:回答文本片段
 - `done`:结束
 
@@ -156,15 +154,31 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.examp
 2. `rag/retriever.py` 对文档块分词并建立 BM25 索引。中文、日文、韩文使用双字切分。
 3. `rag/index.py` 计算文档目录指纹,文件变化后在后台重建索引。
 4. `app.py` 根据问题检索最相关的文档块,把这些片段放入提示词,然后流式返回回答。
-5. `static/widget.js` 渲染右下角聊天挂件并消费 SSE 流。
+5. `static/widget.js` 和 `static/widget.css` 渲染右下角聊天挂件并消费 SSE 流。
 
 语料规模较大时,可以把检索器替换成向量检索,摄取层和 HTTP 层不需要跟着改。
+
+## 生产更新流程
+
+源代码、运行目录和知识库文档应分开管理。每次发布建议按以下顺序执行：
+
+1. 拉取已审核的源码版本，并在服务虚拟环境中安装依赖。
+2. 同步应用文件和静态资源，确保 `widget.js` 与 `widget.css` 同时更新。
+3. 重启服务，然后通过公网反向代理验证 `/api/health`、`/api/config`、两个挂件资源和一次
+   真实问答。
+4. 强制刷新接入网站，避免旧缓存掩盖发布问题。
+
+将 `DOCS_DIR` 指向的目录作为知识库唯一事实来源，只更新其中的原始文档，不要手工修改
+生成的索引数据。服务会根据文档指纹自动重建内存索引；每次更新文档后，应使用包含新事实
+的真实问题进行验证。产品版本信息应直接写进文档，并在每次产品发布时同步更新或删除过期
+页面。
 
 ## 开发
 
 ```bash
 python3 -m pytest tests/ -q
 node --check static/widget.js
+python3 -m pytest tests/test_widget_assets.py -q
 ```
 
 项目包含 Docker 部署文件:

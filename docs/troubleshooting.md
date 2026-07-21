@@ -2,28 +2,27 @@
 
 ## The embedded launcher is not visible
 
-The widget uses a Shadow DOM and injects its component CSS through an inline
-`<style>` element. If the host site's CSP has `style-src 'self'` without
-`'unsafe-inline'`, the browser can load `widget.js` while refusing the styles
-that position the launcher in the bottom-right corner.
+The widget uses a Shadow DOM and loads its component CSS from `widget.css`.
+Both assets must be reachable through the same public bot base URL.
 
 For a same-origin reverse proxy, allow:
 
 ```http
-style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'
+style-src 'self'; script-src 'self'; connect-src 'self'
 ```
 
-For cross-origin embedding, add the bot origin to `script-src` and
-`connect-src`, then add the host origin to `ALLOWED_ORIGINS` on the bot. Do not
-add `'unsafe-inline'` to `script-src`.
+For cross-origin embedding, add the bot origin to `script-src`, `connect-src`,
+and `style-src`, then add the host origin to `ALLOWED_ORIGINS` on the bot. The
+widget does not need `'unsafe-inline'` in either `script-src` or `style-src`.
 
 Verification checklist:
 
 1. `widget.js` returns HTTP 200.
-2. `/api/config` returns HTTP 200.
-3. The browser console has no CSP or CORS error.
-4. The host page has a `<body>` when the widget script runs.
-5. A hard refresh loads the latest host JavaScript after deployment.
+2. `widget.css` returns HTTP 200 with a CSS content type.
+3. `/api/config` returns HTTP 200.
+4. The browser console has no CSP or CORS error.
+5. The host page has a `<body>` when the widget script runs.
+6. A hard refresh loads the latest widget assets after deployment.
 
 ## Deployment failed with "build timeout"
 
