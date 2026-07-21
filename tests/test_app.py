@@ -28,6 +28,16 @@ def test_source_only_answer_handles_no_hits():
     assert "No matching source excerpts" in _source_only_answer([])
 
 
+def test_source_only_answer_can_hide_source_metadata():
+    chunk = Chunk(doc_name="policy", section="Refunds", text="Refunds are available within 14 days.")
+
+    answer = _source_only_answer([(chunk, 3.25)], show_sources=False)
+
+    assert "Refunds are available" in answer
+    assert "policy" not in answer
+    assert "相关度" not in answer
+
+
 def test_stream_delta_content_ignores_usage_chunk_without_delta():
     event = SimpleNamespace(choices=[SimpleNamespace(delta=None)])
 

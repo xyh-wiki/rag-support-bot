@@ -53,6 +53,7 @@ DOCS_DIR = Path(os.environ.get("DOCS_DIR", BASE_DIR / "docs"))
 # Testing aid: expose the loaded knowledge base in a side panel.
 # Turn off for production deployments.
 SHOW_KB_PANEL = os.environ.get("SHOW_KB_PANEL", "false").lower() in {"1", "true", "yes"}
+SHOW_SOURCES = os.environ.get("SHOW_SOURCES", "true").lower() in {"1", "true", "yes"}
 # Comma-separated origins allowed to call the API cross-origin (for embedding
 # the widget into other sites/apps). Empty = same-origin only.
 ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()]
@@ -64,7 +65,7 @@ Answer using ONLY the knowledge-base excerpts provided in each message.
 Rules:
 - If the excerpts do not contain the answer, say you don't know — never \
 invent facts.
-- Cite the section you used, e.g. (see: billing — Refund policy).
+{"- Cite the section you used, e.g. (see: billing — Refund policy)." if SHOW_SOURCES else "- Do not expose document names, section names, citations, source labels, or retrieval scores."}
 - Be concise and friendly. Answer in the same language the user writes in.
 """
 
@@ -135,7 +136,7 @@ def _stream_delta_content(event) -> str | None:
     return content if isinstance(content, str) and content else None
 
 
-def _source_only_answer(hits) -> str:
+def _source_only_answer(hits, show_sources: bool = True) -> str:
     """Return useful results when no completion API key is configured."""
     if not hits:
         return (
@@ -151,14 +152,17 @@ def _source_only_answer(hits) -> str:
         text = " ".join(chunk.text.split())
         if len(text) > SOURCE_PREVIEW_CHARS:
             text = text[:SOURCE_PREVIEW_CHARS].rstrip() + "..."
-        lines.extend([
-            f"## {idx}. {chunk.source_label}",
-            "",
-            text,
-            "",
-            f"相关度: {score:.2f}",
-            "",
-        ])
+        if show_sources:
+            lines.extend([
+                f"## {idx}. {chunk.source_label}",
+                "",
+                text,
+                "",
+                f"相关度: {score:.2f}",
+                "",
+            ])
+        else:
+            lines.extend([text, ""])
     return "\n".join(lines).strip()
 
 
@@ -171,6 +175,7 @@ def config():
         "placeholder": BOT_PLACEHOLDER,
         "lang": BOT_LANG,
         "show_kb": SHOW_KB_PANEL,
+        "show_sources": SHOW_SOURCES,
     }
 
 
@@ -246,10 +251,11 @@ def chat(req: ChatRequest, request: Request):
             hits = retriever.search(rewritten, top_k=TOP_K)
 
     def generate():
-        yield _sse("sources", {"sources": [c.source_label for c, _ in hits]})
+        if SHOW_SOURCES:
+            yield _sse("sources", {"sources": [c.source_label for c, _ in hits]})
 
         if not os.environ.get("OPENAI_API_KEY"):
-            yield _sse("token", {"text": _source_only_answer(hits)})
+            yield _sse("token", {"text": _source_only_answer(hits, SHOW_SOURCES)})
             yield _sse("done", {})
             return
 
