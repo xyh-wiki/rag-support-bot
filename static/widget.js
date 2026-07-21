@@ -4,6 +4,7 @@
   const currentScript = document.currentScript;
   const scriptUrl = new URL(currentScript.src, window.location.href);
   const apiBase = (currentScript.dataset.apiBase || scriptUrl.origin).replace(/\/$/, "");
+  const assetVersion = scriptUrl.search;
   const startOpen = currentScript.dataset.open === "true";
 
   function boot() {
@@ -14,7 +15,7 @@
 
   const root = rootHost.attachShadow({ mode: "open" });
   root.innerHTML = `
-    <link rel="stylesheet" href="${apiBase}/static/widget.css">
+    <link rel="stylesheet" href="${apiBase}/static/widget.css${assetVersion}">
     <section class="panel" aria-label="Knowledge base" aria-hidden="true">
       <header class="header">
         <span class="dot" aria-hidden="true"></span>

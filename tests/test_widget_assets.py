@@ -10,7 +10,8 @@ def test_widget_uses_external_stylesheet():
     widget = (ROOT / "static" / "widget.js").read_text(encoding="utf-8")
 
     assert "<style" not in widget
-    assert '${apiBase}/static/widget.css' in widget
+    assert 'const assetVersion = scriptUrl.search' in widget
+    assert '${apiBase}/static/widget.css${assetVersion}' in widget
     assert (ROOT / "static" / "widget.css").is_file()
 
 
