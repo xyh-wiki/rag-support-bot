@@ -67,6 +67,7 @@
   let lang = "en";
   let librariesLoading = null;
   let kbEnabled = false;
+  let showSources = true;
   let kbLoaded = false;
   let kbRefreshTimer = null;
 
@@ -195,6 +196,7 @@
     title.textContent = cfg.name;
     tagline.textContent = cfg.tagline;
     input.placeholder = cfg.placeholder;
+    showSources = cfg.show_sources !== false;
     if (!currentScript.dataset.noTitle) document.title = cfg.name;
     if (cfg.show_kb) enableKbPanel();
   }).catch(() => {});
@@ -238,7 +240,7 @@
           if (ev === "token") {
             answer += data.text;
             renderMarkdown(bubble, answer);
-          } else if (ev === "sources" && data.sources.length) {
+          } else if (ev === "sources" && showSources && data.sources.length) {
             const s = document.createElement("div");
             s.className = "sources";
             const strong = document.createElement("b");
