@@ -14,13 +14,6 @@ streams answers with citations.
 
 Supported files: Markdown, text, PDF, Word (`.docx`), Excel (`.xlsx`), and HTML.
 
-```html
-<script
-  src="https://your-domain.example/static/widget.js?v=RELEASE_ID"
-  data-api-base="https://your-domain.example">
-</script>
-```
-
 ## What it does
 
 - Parses documents into section-level chunks.
@@ -29,7 +22,7 @@ Supported files: Markdown, text, PDF, Word (`.docx`), Excel (`.xlsx`), and HTML.
 - Streams responses over Server-Sent Events.
 - Shows source citations before the answer.
 - Falls back to source-only mode when no completion API key is configured.
-- Exposes a floating widget that can be embedded in other websites.
+- Provides a floating assistant for the built-in showcase page.
 
 ## Quick Start
 
@@ -68,58 +61,21 @@ synthesize an answer.
 | `BOT_TAGLINE` | Subtitle shown in the UI | sample text |
 | `BOT_PLACEHOLDER` | Input placeholder text | sample text |
 | `BOT_LANG` | UI language (`en`, `zh-CN`, ...) | `en` |
+| `PUBLIC_ORIGIN` | Sole showcase origin allowed to call the chat endpoint | current request origin |
 | `DOCS_DIR` | Knowledge-base directory | `docs/` |
 | `SYSTEM_PROMPT_FILE` | Path to a custom system prompt | built-in prompt |
 | `SHOW_KB_PANEL` | Show loaded documents in the UI | `false` |
 | `SHOW_SOURCES` | Send and display document source labels and ask the model for citations | `true` |
-| `ALLOWED_ORIGINS` | Comma-separated CORS origins | same-origin only |
 
-## Embed the Widget
+## Access Restrictions
 
-```html
-<script
-  src="https://your-domain.example/static/widget.js?v=RELEASE_ID"
-  data-api-base="https://your-domain.example">
-</script>
-```
+This service is a same-origin product showcase. It does not support cross-origin
+embedding or third-party API integrations. `POST /api/chat` validates `Origin`
+and browser Fetch Metadata; missing-origin and cross-site requests receive HTTP
+403. Set `PUBLIC_ORIGIN` to the canonical showcase URL in production. Per-IP
+rate limiting still applies through `RATE_LIMIT_PER_MIN`.
 
-Use `data-open="true"` to open the panel on page load.
-Replace `RELEASE_ID` on every deployment. The query string is also forwarded to
-`widget.css`, preventing a CDN or browser from mixing widget asset versions.
-
-For a different website origin, set:
-
-```bash
-export ALLOWED_ORIGINS=https://your-site.com
-```
-
-### Content Security Policy (CSP)
-
-The widget renders its isolated UI in a Shadow DOM and loads `widget.css` as a
-separate asset. If the bot is exposed through a same-origin reverse proxy such
-as `/support-bot/`, a minimal policy is:
-
-```http
-Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self'
-```
-
-For a cross-origin deployment, allow the bot origin in `script-src`,
-`connect-src`, and `style-src`, then configure `ALLOWED_ORIGINS` on the bot:
-
-```http
-Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.example.com; connect-src 'self' https://bot.example.com; style-src 'self' https://bot.example.com
-```
-
-Keep all directives restricted to trusted origins. The widget does not require
-`'unsafe-inline'` for scripts or styles.
-
-If the launcher is missing from the bottom-right corner, check the browser
-console for CSP or CORS violations, confirm that `widget.js`, `widget.css`, and
-`/api/config` return HTTP 200, and hard-refresh the host page after deployment.
-
-See `examples/embed.html` for a minimal host page.
-
-## HTTP API
+## Internal HTTP Endpoints
 
 `POST /api/chat`
 
@@ -142,15 +98,13 @@ Other endpoints:
 - `GET /api/health`
 - `GET /api/kb` when `SHOW_KB_PANEL=true`
 
-See `examples/curl-sse.sh` for a command-line SSE example.
-
 ## Use Cases
 
 - Customer support knowledge bases
 - Internal documentation search
 - Policy and compliance Q&A
 - PDF, Word, and Excel document search
-- Website chat widgets for existing docs
+- Standalone product knowledge-base demonstrations
 
 More notes: `docs-public/use-cases.md`.
 
@@ -164,7 +118,7 @@ More notes: `docs-public/use-cases.md`.
    the background when files change.
 4. `app.py` retrieves the top matching chunks for each question, adds them to
    the prompt, and streams the generated answer.
-5. `static/widget.js` and `static/widget.css` render the floating browser widget
+5. `static/widget.js` and `static/widget.css` render the same-origin browser assistant
    and consume the SSE stream.
 
 For larger corpora, the retriever can be replaced with a vector search backend
@@ -179,10 +133,10 @@ separate directories. For each release:
    virtual environment.
 2. Synchronize application and static assets, including both `widget.js` and
    `widget.css`.
-3. Restart the service, then verify `/api/health`, `/api/config`, the two widget
-   assets, and one real chat request through the public reverse proxy.
-4. Update the widget script's `v` query parameter, then hard-refresh the host
-   site so cached assets cannot hide a bad rollout.
+3. Restart the service, then verify `/api/health`, `/api/config`, the page assets,
+   and one real same-origin chat request through the public reverse proxy.
+4. Update the static asset version parameters, then hard-refresh the showcase
+   page so cached assets cannot hide a bad rollout.
 
 Treat the configured `DOCS_DIR` as the canonical knowledge base. Add or replace
 documents there instead of editing generated index data. The service detects

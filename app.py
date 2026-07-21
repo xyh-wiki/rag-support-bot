@@ -49,14 +49,12 @@ BOT_PLACEHOLDER = os.environ.get(
     "BOT_PLACEHOLDER", "Ask about billing, deployments, API…"
 )
 BOT_LANG = os.environ.get("BOT_LANG", "en")
+PUBLIC_ORIGIN = os.environ.get("PUBLIC_ORIGIN", "").rstrip("/")
 DOCS_DIR = Path(os.environ.get("DOCS_DIR", BASE_DIR / "docs"))
 # Testing aid: expose the loaded knowledge base in a side panel.
 # Turn off for production deployments.
 SHOW_KB_PANEL = os.environ.get("SHOW_KB_PANEL", "false").lower() in {"1", "true", "yes"}
 SHOW_SOURCES = os.environ.get("SHOW_SOURCES", "true").lower() in {"1", "true", "yes"}
-# Comma-separated origins allowed to call the API cross-origin (for embedding
-# the widget into other sites/apps). Empty = same-origin only.
-ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()]
 
 DEFAULT_SYSTEM_PROMPT = f"""\
 You answer questions for {BOT_NAME}.
@@ -77,15 +75,6 @@ SYSTEM_PROMPT = (
 )
 
 app = FastAPI(title=BOT_NAME, docs_url=None, redoc_url=None)
-if ALLOWED_ORIGINS:
-    from fastapi.middleware.cors import CORSMiddleware
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=ALLOWED_ORIGINS,
-        allow_methods=["GET", "POST"],
-        allow_headers=["Content-Type"],
-    )
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 index_manager = DocumentIndex(DOCS_DIR)
 
@@ -109,6 +98,30 @@ def _check_rate_limit(request: Request) -> None:
         if len(bucket) >= RATE_LIMIT_PER_MIN:
             raise HTTPException(429, "Too many requests — please wait a minute.")
         bucket.append(now)
+
+
+def _request_origin(request: Request) -> str:
+    """Return the public origin of this service, including behind a proxy."""
+    scheme = request.headers.get("x-forwarded-proto", request.url.scheme).split(",")[0].strip()
+    host = request.headers.get("x-forwarded-host", request.headers.get("host", ""))
+    host = host.split(",")[0].strip()
+    return f"{scheme}://{host}".rstrip("/")
+
+
+def _check_chat_origin(request: Request) -> None:
+    """Allow chat only from the service's own showcase page."""
+    origin = request.headers.get("origin")
+    if not origin:
+        raise HTTPException(403, "Chat is available only on this website.")
+
+    origin = origin.rstrip("/")
+    expected_origin = PUBLIC_ORIGIN or _request_origin(request)
+    if origin != expected_origin:
+        raise HTTPException(403, "Chat is available only on this website.")
+
+    fetch_site = request.headers.get("sec-fetch-site")
+    if fetch_site and fetch_site != "same-origin":
+        raise HTTPException(403, "Cross-site chat requests are not allowed.")
 
 
 class ChatTurn(BaseModel):
@@ -242,6 +255,7 @@ def _rewrite_query(question: str) -> str | None:
 
 @app.post("/api/chat")
 def chat(req: ChatRequest, request: Request):
+    _check_chat_origin(request)
     _check_rate_limit(request)
     retriever = index_manager.retriever
     hits = retriever.search(req.message, top_k=TOP_K)

@@ -1,19 +1,18 @@
 # Troubleshooting
 
-## The embedded launcher is not visible
+## The showcase launcher is not visible
 
-The widget uses a Shadow DOM and loads its component CSS from `widget.css`.
-Both assets must be reachable through the same public bot base URL.
+The built-in assistant uses a Shadow DOM and loads its component CSS from
+`widget.css`. Both assets must be reachable from the showcase origin.
 
-For a same-origin reverse proxy, allow:
+The page and chat API must remain on the same origin. Allow:
 
 ```http
 style-src 'self'; script-src 'self'; connect-src 'self'
 ```
 
-For cross-origin embedding, add the bot origin to `script-src`, `connect-src`,
-and `style-src`, then add the host origin to `ALLOWED_ORIGINS` on the bot. The
-widget does not need `'unsafe-inline'` in either `script-src` or `style-src`.
+Cross-origin embedding is intentionally unsupported. The assistant does not
+need `'unsafe-inline'` in either `script-src` or `style-src`.
 
 Verification checklist:
 
@@ -21,8 +20,8 @@ Verification checklist:
 2. `widget.css` returns HTTP 200 with a CSS content type.
 3. `/api/config` returns HTTP 200.
 4. The browser console has no CSP or CORS error.
-5. The host page has a `<body>` when the widget script runs.
-6. The embed URL uses a new `?v=RELEASE_ID` value for each deployment.
+5. The showcase page has a `<body>` when the assistant script runs.
+6. The asset URL uses a new `?v=RELEASE_ID` value for each deployment.
 7. A hard refresh loads the latest widget assets after deployment.
 
 ## Deployment failed with "build timeout"

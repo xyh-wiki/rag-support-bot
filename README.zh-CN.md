@@ -13,13 +13,6 @@
 
 支持格式:Markdown、纯文本、PDF、Word(`.docx`)、Excel(`.xlsx`)和 HTML。
 
-```html
-<script
-  src="https://your-domain.example/static/widget.js?v=RELEASE_ID"
-  data-api-base="https://your-domain.example">
-</script>
-```
-
 ## 功能
 
 - 按文档结构切分内容。
@@ -28,7 +21,7 @@
 - 通过 Server-Sent Events 流式输出。
 - 回答前先返回来源列表。
 - 没有配置补全接口 key 时,仍可返回命中的原文片段。
-- 提供可嵌入其他网站的浮动聊天挂件。
+- 提供本站专用的浮动问答组件。
 
 ## 快速开始
 
@@ -66,55 +59,19 @@ docker compose up --build
 | `BOT_TAGLINE` | 页面副标题 | 示例文案 |
 | `BOT_PLACEHOLDER` | 输入框占位文字 | 示例文案 |
 | `BOT_LANG` | 页面语言(`en`、`zh-CN` 等) | `en` |
+| `PUBLIC_ORIGIN` | 唯一允许调用问答接口的展示站点来源 | 根据当前请求判断 |
 | `DOCS_DIR` | 知识库目录 | `docs/` |
 | `SYSTEM_PROMPT_FILE` | 自定义系统提示词文件 | 内置提示词 |
 | `SHOW_KB_PANEL` | 是否在页面显示已加载文档 | `false` |
 | `SHOW_SOURCES` | 是否发送并展示文档来源，同时要求模型附带引用 | `true` |
-| `ALLOWED_ORIGINS` | 允许跨域调用的来源,逗号分隔 | 仅同源 |
 
-## 嵌入网页
+## 访问限制
 
-```html
-<script
-  src="https://your-domain.example/static/widget.js?v=RELEASE_ID"
-  data-api-base="https://your-domain.example">
-</script>
-```
+这是一个仅供本站展示的问答页面，不提供跨域嵌入或第三方 API 接入。`POST /api/chat`
+会校验 `Origin` 和浏览器 Fetch Metadata，只接受 `PUBLIC_ORIGIN` 页面发起的同源请求；无来源及
+跨站请求均返回 HTTP 403。每个 IP 仍受 `RATE_LIMIT_PER_MIN` 限制。
 
-加上 `data-open="true"` 可以让聊天窗在页面加载后自动展开。
-每次发布都应替换 `RELEASE_ID`。该查询参数也会传递给 `widget.css`，避免 CDN 或浏览器混用
-不同版本的挂件资源。
-
-跨域嵌入时需要设置:
-
-```bash
-export ALLOWED_ORIGINS=https://your-site.com
-```
-
-### 内容安全策略（CSP）
-
-挂件使用 Shadow DOM 隔离界面，并通过独立的 `widget.css` 加载组件样式。如果通过
-`/support-bot/` 等路径做同源反向代理，可使用以下最小策略：
-
-```http
-Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self'
-```
-
-跨域部署时，需要在 `script-src`、`connect-src` 和 `style-src` 中允许机器人域名，并在
-机器人服务中配置 `ALLOWED_ORIGINS`：
-
-```http
-Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.example.com; connect-src 'self' https://bot.example.com; style-src 'self' https://bot.example.com
-```
-
-所有指令都应限制在可信来源。挂件的脚本和样式均不需要开启 `'unsafe-inline'`。
-
-如果右下角没有出现机器人按钮，请检查浏览器控制台是否存在 CSP 或 CORS 拒绝，确认
-`widget.js`、`widget.css` 和 `/api/config` 均返回 HTTP 200，并在部署后强制刷新宿主页面。
-
-最小嵌入示例见 `examples/embed.html`。
-
-## HTTP API
+## 内部 HTTP 接口
 
 `POST /api/chat`
 
@@ -137,15 +94,13 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.examp
 - `GET /api/health`
 - `GET /api/kb`,仅在 `SHOW_KB_PANEL=true` 时可用
 
-命令行 SSE 示例见 `examples/curl-sse.sh`。
-
 ## 使用场景
 
 - 客服知识库
 - 内部文档检索
 - 制度、合规、流程问答
 - PDF、Word、Excel 文档检索
-- 嵌入现有网站的右下角聊天挂件
+- 独立的产品知识库演示页面
 
 更多说明见 `docs-public/use-cases.md`。
 
@@ -156,7 +111,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.examp
 2. `rag/retriever.py` 对文档块分词并建立 BM25 索引。中文、日文、韩文使用双字切分。
 3. `rag/index.py` 计算文档目录指纹,文件变化后在后台重建索引。
 4. `app.py` 根据问题检索最相关的文档块,把这些片段放入提示词,然后流式返回回答。
-5. `static/widget.js` 和 `static/widget.css` 渲染右下角聊天挂件并消费 SSE 流。
+5. `static/widget.js` 和 `static/widget.css` 渲染本站问答组件并消费 SSE 流。
 
 语料规模较大时,可以把检索器替换成向量检索,摄取层和 HTTP 层不需要跟着改。
 
@@ -166,9 +121,9 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.examp
 
 1. 拉取已审核的源码版本，并在服务虚拟环境中安装依赖。
 2. 同步应用文件和静态资源，确保 `widget.js` 与 `widget.css` 同时更新。
-3. 重启服务，然后通过公网反向代理验证 `/api/health`、`/api/config`、两个挂件资源和一次
-   真实问答。
-4. 更新挂件脚本的 `v` 查询参数，然后强制刷新接入网站，避免旧缓存掩盖发布问题。
+3. 重启服务，然后通过公网反向代理验证 `/api/health`、`/api/config`、页面资源和一次
+   本站真实问答。
+4. 更新静态资源版本参数，然后强制刷新展示页面，避免旧缓存掩盖发布问题。
 
 将 `DOCS_DIR` 指向的目录作为知识库唯一事实来源，只更新其中的原始文档，不要手工修改
 生成的索引数据。服务会根据文档指纹自动重建内存索引；每次更新文档后，应使用包含新事实

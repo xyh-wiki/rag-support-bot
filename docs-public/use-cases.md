@@ -6,7 +6,7 @@ main requirement is to answer questions with traceable citations.
 ## Customer support knowledge base
 
 Index product docs, troubleshooting guides, billing policies, and release notes.
-Embed the widget on a help center or in an internal support console.
+Use the hosted showcase to demonstrate grounded answers over support content.
 
 ## Internal documentation search
 
@@ -24,7 +24,7 @@ visible so reviewers can jump back to the source section.
 Use the parsers for mixed document libraries. Word files are split by heading,
 PDF files by page, and Excel files by worksheet and row.
 
-## Website chat widget
+## Hosted product demonstration
 
-Serve the backend from one domain and embed `static/widget.js` in another site.
-Set `ALLOWED_ORIGINS` for browser-based cross-origin calls.
+Use the built-in page as a focused product demonstration. The chat endpoint is
+same-origin only and is not offered as an integration for external websites.

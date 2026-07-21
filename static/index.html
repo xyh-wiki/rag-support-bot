@@ -1,68 +1,150 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Northwind Docs Hub</title>
-<meta name="description" content="Sample product knowledge base with document search, citations, and an embeddable chat widget.">
-<meta name="theme-color" content="#0f6b54">
-<link rel="canonical" href="https://bot.xyh.wiki/">
-<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-<link rel="icon" type="image/x-icon" sizes="48x48" href="/favicon.ico">
-<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Northwind Docs Hub">
-<meta property="og:description" content="Sample product knowledge base with document search, citations, and an embeddable chat widget.">
-<meta property="og:url" content="https://bot.xyh.wiki/">
-<meta property="og:image" content="https://bot.xyh.wiki/static/apple-touch-icon.png">
-<meta name="twitter:card" content="summary">
-<style>
-  html, body { min-height: 100%; }
-  body {
-    margin: 0;
-    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
-    background: #f6f7f9;
-    color: #1f2430;
-  }
-  .page {
-    min-height: 100vh;
-    display: grid;
-    place-items: center;
-    padding: 32px 20px;
-  }
-  .intro {
-    width: min(680px, 100%);
-  }
-  .intro h1 {
-    margin: 0 0 10px;
-    font-size: clamp(26px, 5vw, 42px);
-    line-height: 1.12;
-    font-weight: 700;
-  }
-  .intro p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 16px;
-    line-height: 1.7;
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Northwind Docs Hub</title>
+  <meta name="description" content="Ask your product knowledge base and get clear, grounded answers with citations.">
+  <meta name="theme-color" content="#f4f2ed">
+  <link rel="canonical" href="https://bot.xyh.wiki/">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="icon" type="image/x-icon" sizes="48x48" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <link rel="stylesheet" href="/static/home.css?v=20260721">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Northwind Docs Hub">
+  <meta property="og:description" content="Ask your product knowledge base and get clear, grounded answers with citations.">
+  <meta property="og:url" content="https://bot.xyh.wiki/">
+  <meta property="og:image" content="https://bot.xyh.wiki/static/apple-touch-icon.png">
+  <meta name="twitter:card" content="summary">
 </head>
 <body>
-<main class="page">
-  <section class="intro" aria-label="Assistant">
-    <h1 id="page-title">Northwind Docs Hub</h1>
-    <p id="page-tagline">Search a sample product knowledge base with citations.</p>
-  </section>
-</main>
-<noscript><p style="padding:16px 22px">This page requires JavaScript. Please enable it and reload.</p></noscript>
-<script>
-fetch("/api/config").then(r => r.json()).then(cfg => {
-  document.title = cfg.name;
-  document.documentElement.lang = cfg.lang || "en";
-  document.getElementById("page-title").textContent = cfg.name;
-  document.getElementById("page-tagline").textContent = cfg.tagline;
-}).catch(() => {});
-</script>
-<script src="/static/widget.js?v=60027d6"></script>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M9 8.5h14a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4h-6.4L11 27v-4.5H9a4 4 0 0 1-4-4v-6a4 4 0 0 1 4-4Z"/><path d="M11 14h10M11 18h6"/></svg>
+        </span>
+        <span id="brand-name">Northwind Docs</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#capabilities" data-copy="navCapabilities">Capabilities</a>
+        <a href="#workflow" data-copy="navWorkflow">How it works</a>
+        <button class="nav-cta js-open-chat" type="button" data-copy="navAsk">Ask assistant</button>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="eyebrow"><span></span><span data-copy="eyebrow">AI knowledge assistant</span></div>
+          <h1 id="hero-title"><span data-copy="heroLead">Answers hidden in your docs,</span> <em data-copy="heroAccent">found in seconds.</em></h1>
+          <p id="page-tagline" class="hero-summary">Search your product knowledge base and get clear, grounded answers with traceable sources.</p>
+          <div class="hero-actions">
+            <button class="primary-action js-open-chat" type="button">
+              <span data-copy="heroCta">Ask a question</span>
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg>
+            </button>
+            <a class="text-action" href="#capabilities" data-copy="heroLearn">Explore capabilities</a>
+          </div>
+          <div class="trust-row" aria-label="Service highlights">
+            <div><svg viewBox="0 0 20 20" fill="none"><path d="m5 10 3 3 7-7"/></svg><span data-copy="trustGrounded">Grounded in your content</span></div>
+            <div><svg viewBox="0 0 20 20" fill="none"><path d="m5 10 3 3 7-7"/></svg><span data-copy="trustSources">Source citations included</span></div>
+          </div>
+        </div>
+
+        <div class="assistant-demo" aria-label="Assistant response preview">
+          <div class="demo-topbar">
+            <div class="demo-identity">
+              <span class="demo-avatar"><span></span></span>
+              <div><strong id="demo-name">Northwind Assistant</strong><small><i></i><span data-copy="demoOnline">Online · Knowledge synced</span></small></div>
+            </div>
+            <span class="demo-menu" aria-hidden="true">•••</span>
+          </div>
+          <div class="demo-body">
+            <div class="message message-user" data-copy="demoQuestion">How do I invite a new team member?</div>
+            <div class="message message-assistant">
+              <span class="tiny-avatar" aria-hidden="true">N</span>
+              <div class="answer-card">
+                <p data-copy="demoAnswer">Go to <strong>Settings → Team</strong>, then select <strong>Invite member</strong>. Enter their email and choose a role. The invitation will be valid for 7 days.</p>
+                <div class="source-card">
+                  <svg viewBox="0 0 20 20" fill="none"><path d="M5 3.5h7l3 3v10H5v-13Z"/><path d="M12 3.5v3h3M8 10h4M8 13h4"/></svg>
+                  <div><span data-copy="demoSource">Source</span><strong data-copy="demoDocument">Getting started · Team management</strong></div>
+                  <span class="source-match" data-copy="demoMatch">98% match</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="demo-composer js-open-chat" type="button">
+            <span data-copy="demoPlaceholder">Ask anything about the product…</span>
+            <i><svg viewBox="0 0 20 20" fill="none"><path d="m17 3-6 14-2-6-6-2 14-6ZM9 11l8-8"/></svg></i>
+          </button>
+          <span class="floating-note note-fast"><b>2.4s</b><small data-copy="noteResponse">average response</small></span>
+          <span class="floating-note note-index"><b id="indexed-count">Live</b><small data-copy="noteIndexed">knowledge indexed</small></span>
+        </div>
+      </section>
+
+      <section class="proof" aria-label="Highlights">
+        <p data-copy="proofIntro">Built for teams that need reliable answers, not more searching</p>
+        <div class="proof-items">
+          <span><b>PDF</b></span><span><b>DOCX</b></span><span><b>MD</b></span><span><b>XLSX</b></span><span><b>HTML</b></span>
+        </div>
+      </section>
+
+      <section class="section capabilities" id="capabilities">
+        <div class="section-heading">
+          <div><span class="section-kicker" data-copy="capKicker">Built for clarity</span><h2 data-copy="capTitle">One place for every answer.</h2></div>
+          <p data-copy="capSummary">Turn scattered documentation into an assistant your team can actually rely on.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-main">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4M8 11h6M11 8v6"/></svg></span>
+            <span class="feature-number">01</span>
+            <h3 data-copy="featureSearchTitle">Answers, not search results</h3>
+            <p data-copy="featureSearchText">Ask naturally and get a concise response assembled from the most relevant passages.</p>
+            <div class="search-visual"><span data-copy="searchVisual">How does billing work?</span><i></i><i></i><i></i></div>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 3.5h10l4 4v13H5v-17Z"/><path d="M15 3.5v4h4M8 12h8M8 16h6"/></svg></span>
+            <span class="feature-number">02</span>
+            <h3 data-copy="featureSourceTitle">Every claim traceable</h3>
+            <p data-copy="featureSourceText">Citations take you back to the exact document and section behind each answer.</p>
+          </article>
+          <article class="feature-card feature-dark">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+            <span class="feature-number">03</span>
+            <h3 data-copy="featureFormatsTitle">Built for real documents</h3>
+            <p data-copy="featureFormatsText">Search Markdown, PDF, Word, Excel and HTML together from one focused experience.</p>
+            <span class="code-pill">PDF · DOCX · XLSX · HTML · MD</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="section workflow" id="workflow">
+        <div class="workflow-copy">
+          <span class="section-kicker" data-copy="flowKicker">How it works</span>
+          <h2 data-copy="flowTitle">From document to answer, without the noise.</h2>
+          <p data-copy="flowSummary">Your content stays at the center of every response. The assistant finds, ranks and presents only what matters.</p>
+          <button class="primary-action js-open-chat" type="button"><span data-copy="flowCta">Try the assistant</span><svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></button>
+        </div>
+        <ol class="workflow-steps">
+          <li><span>01</span><div><h3 data-copy="stepOneTitle">Connect your knowledge</h3><p data-copy="stepOneText">Add product docs, policies, guides and support material in the formats you already use.</p></div></li>
+          <li><span>02</span><div><h3 data-copy="stepTwoTitle">Ask in plain language</h3><p data-copy="stepTwoText">No keywords or advanced filters. Ask the question exactly as you would ask a teammate.</p></div></li>
+          <li><span>03</span><div><h3 data-copy="stepThreeTitle">Get a grounded answer</h3><p data-copy="stepThreeText">Receive a clear response with its source, streamed to you in real time.</p></div></li>
+        </ol>
+      </section>
+
+      <section class="final-cta">
+        <span class="cta-orbit orbit-one"></span><span class="cta-orbit orbit-two"></span>
+        <div><span class="section-kicker" data-copy="ctaKicker">Your knowledge, ready to answer</span><h2 data-copy="ctaTitle">Stop searching. Start asking.</h2><p data-copy="ctaSummary">Find the answer already living in your documentation.</p></div>
+        <button class="light-action js-open-chat" type="button"><span data-copy="ctaButton">Ask your first question</span><svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></button>
+      </section>
+    </main>
+
+    <footer><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M9 8.5h14a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4h-6.4L11 27v-4.5H9a4 4 0 0 1-4-4v-6a4 4 0 0 1 4-4Z"/><path d="M11 14h10M11 18h6"/></svg></span><span id="footer-name">Northwind Docs</span></a><p data-copy="footerText">Reliable answers, grounded in your knowledge.</p><span>© <span id="year"></span></span></footer>
+  </div>
+  <noscript><p class="noscript">This page requires JavaScript. Please enable it and reload.</p></noscript>
+  <script src="/static/home.js?v=20260721"></script>
+  <script src="/static/widget.js?v=60027d6"></script>
 </body>
 </html>

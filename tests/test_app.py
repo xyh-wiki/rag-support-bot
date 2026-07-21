@@ -6,7 +6,11 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app import _source_only_answer, _stream_delta_content
+from fastapi import HTTPException
+from starlette.requests import Request
+
+import app
+from app import _check_chat_origin, _source_only_answer, _stream_delta_content
 from rag.ingest import Chunk
 
 
@@ -48,3 +52,60 @@ def test_stream_delta_content_returns_text():
     event = SimpleNamespace(choices=[SimpleNamespace(delta=SimpleNamespace(content="回答"))])
 
     assert _stream_delta_content(event) == "回答"
+
+
+def _request(headers: dict[str, str]) -> Request:
+    raw_headers = [(key.lower().encode(), value.encode()) for key, value in headers.items()]
+    return Request({
+        "type": "http",
+        "method": "POST",
+        "scheme": "https",
+        "path": "/api/chat",
+        "query_string": b"",
+        "headers": raw_headers,
+        "client": ("127.0.0.1", 1234),
+        "server": ("bot.example.com", 443),
+    })
+
+
+def test_chat_origin_accepts_same_origin(monkeypatch):
+    monkeypatch.setattr(app, "PUBLIC_ORIGIN", "https://bot.example.com")
+    _check_chat_origin(_request({
+        "host": "bot.example.com",
+        "origin": "https://bot.example.com",
+        "sec-fetch-site": "same-origin",
+    }))
+
+
+def test_chat_origin_rejects_untrusted_website(monkeypatch):
+    monkeypatch.setattr(app, "PUBLIC_ORIGIN", "https://bot.example.com")
+    try:
+        _check_chat_origin(_request({"host": "bot.example.com", "origin": "https://attacker.example"}))
+    except HTTPException as exc:
+        assert exc.status_code == 403
+    else:
+        raise AssertionError("untrusted origin was accepted")
+
+
+def test_chat_origin_requires_origin_header(monkeypatch):
+    monkeypatch.setattr(app, "PUBLIC_ORIGIN", "https://bot.example.com")
+    try:
+        _check_chat_origin(_request({"host": "bot.example.com"}))
+    except HTTPException as exc:
+        assert exc.status_code == 403
+    else:
+        raise AssertionError("missing origin was accepted")
+
+
+def test_chat_origin_rejects_cross_site_fetch_metadata(monkeypatch):
+    monkeypatch.setattr(app, "PUBLIC_ORIGIN", "https://bot.example.com")
+    try:
+        _check_chat_origin(_request({
+            "host": "bot.example.com",
+            "origin": "https://bot.example.com",
+            "sec-fetch-site": "cross-site",
+        }))
+    except HTTPException as exc:
+        assert exc.status_code == 403
+    else:
+        raise AssertionError("cross-site fetch metadata was accepted")

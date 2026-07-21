@@ -10,6 +10,6 @@ available.
 - Keep `.env`, private prompts, and customer documents out of git.
 - Set `SHOW_KB_PANEL=false` for public deployments unless the document list is
   intended to be visible.
-- Restrict `ALLOWED_ORIGINS` to trusted origins when embedding the widget on
-  external websites.
+- The chat endpoint is restricted to the service's own showcase origin. Do not
+  add cross-origin access or publish it as an integration API.
 - Rotate API keys if they appear in logs, screenshots, or issue reports.
