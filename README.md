@@ -90,6 +90,32 @@ For a different website origin, set:
 export ALLOWED_ORIGINS=https://your-site.com
 ```
 
+### Content Security Policy (CSP)
+
+The widget renders its isolated UI in a Shadow DOM and currently installs its
+component styles with an inline `<style>` element. A host site with a strict CSP
+must therefore allow the widget script, API connections, and inline component
+styles. If the bot is exposed through a same-origin reverse proxy such as
+`/support-bot/`, a minimal compatible policy is:
+
+```http
+Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'
+```
+
+For a cross-origin deployment, also allow the bot origin in `script-src` and
+`connect-src`, and configure `ALLOWED_ORIGINS` on the bot:
+
+```http
+Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.example.com; connect-src 'self' https://bot.example.com; style-src 'self' 'unsafe-inline'
+```
+
+Keep `script-src` restricted to trusted origins. The widget does not require
+`'unsafe-inline'` for scripts.
+
+If the launcher is missing from the bottom-right corner, check the browser
+console for a `style-src` CSP violation, confirm that `widget.js` and
+`/api/config` return HTTP 200, and hard-refresh the host page after deployment.
+
 See `examples/embed.html` for a minimal host page.
 
 ## HTTP API

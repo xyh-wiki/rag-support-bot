@@ -1,5 +1,30 @@
 # Troubleshooting
 
+## The embedded launcher is not visible
+
+The widget uses a Shadow DOM and injects its component CSS through an inline
+`<style>` element. If the host site's CSP has `style-src 'self'` without
+`'unsafe-inline'`, the browser can load `widget.js` while refusing the styles
+that position the launcher in the bottom-right corner.
+
+For a same-origin reverse proxy, allow:
+
+```http
+style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'
+```
+
+For cross-origin embedding, add the bot origin to `script-src` and
+`connect-src`, then add the host origin to `ALLOWED_ORIGINS` on the bot. Do not
+add `'unsafe-inline'` to `script-src`.
+
+Verification checklist:
+
+1. `widget.js` returns HTTP 200.
+2. `/api/config` returns HTTP 200.
+3. The browser console has no CSP or CORS error.
+4. The host page has a `<body>` when the widget script runs.
+5. A hard refresh loads the latest host JavaScript after deployment.
+
 ## Deployment failed with "build timeout"
 
 Builds are limited to 15 minutes on Starter, 30 minutes on Pro and Business.

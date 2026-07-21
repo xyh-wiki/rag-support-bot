@@ -88,6 +88,29 @@ docker compose up --build
 export ALLOWED_ORIGINS=https://your-site.com
 ```
 
+### 内容安全策略（CSP）
+
+挂件使用 Shadow DOM 隔离界面，并通过内联 `<style>` 元素加载组件样式。因此，启用严格
+CSP 的宿主网站需要同时允许挂件脚本、接口连接和内联组件样式。如果通过
+`/support-bot/` 等路径做同源反向代理，可使用以下最小兼容策略：
+
+```http
+Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'
+```
+
+跨域部署时，还需要在 `script-src` 和 `connect-src` 中允许机器人域名，并在机器人服务中
+配置 `ALLOWED_ORIGINS`：
+
+```http
+Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.example.com; connect-src 'self' https://bot.example.com; style-src 'self' 'unsafe-inline'
+```
+
+应继续把 `script-src` 限制在可信来源。挂件脚本不需要开启脚本级别的
+`'unsafe-inline'`。
+
+如果右下角没有出现机器人按钮，请检查浏览器控制台是否存在 `style-src` CSP 拒绝，确认
+`widget.js` 和 `/api/config` 均返回 HTTP 200，并在部署后强制刷新宿主页面。
+
 最小嵌入示例见 `examples/embed.html`。
 
 ## HTTP API
