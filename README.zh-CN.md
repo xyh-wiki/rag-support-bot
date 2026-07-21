@@ -15,7 +15,7 @@
 
 ```html
 <script
-  src="https://your-domain.example/static/widget.js"
+  src="https://your-domain.example/static/widget.js?v=RELEASE_ID"
   data-api-base="https://your-domain.example">
 </script>
 ```
@@ -76,12 +76,14 @@ docker compose up --build
 
 ```html
 <script
-  src="https://your-domain.example/static/widget.js"
+  src="https://your-domain.example/static/widget.js?v=RELEASE_ID"
   data-api-base="https://your-domain.example">
 </script>
 ```
 
 加上 `data-open="true"` 可以让聊天窗在页面加载后自动展开。
+每次发布都应替换 `RELEASE_ID`。该查询参数也会传递给 `widget.css`，避免 CDN 或浏览器混用
+不同版本的挂件资源。
 
 跨域嵌入时需要设置:
 
@@ -166,7 +168,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://bot.examp
 2. 同步应用文件和静态资源，确保 `widget.js` 与 `widget.css` 同时更新。
 3. 重启服务，然后通过公网反向代理验证 `/api/health`、`/api/config`、两个挂件资源和一次
    真实问答。
-4. 强制刷新接入网站，避免旧缓存掩盖发布问题。
+4. 更新挂件脚本的 `v` 查询参数，然后强制刷新接入网站，避免旧缓存掩盖发布问题。
 
 将 `DOCS_DIR` 指向的目录作为知识库唯一事实来源，只更新其中的原始文档，不要手工修改
 生成的索引数据。服务会根据文档指纹自动重建内存索引；每次更新文档后，应使用包含新事实

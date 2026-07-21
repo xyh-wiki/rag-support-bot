@@ -16,7 +16,7 @@ Supported files: Markdown, text, PDF, Word (`.docx`), Excel (`.xlsx`), and HTML.
 
 ```html
 <script
-  src="https://your-domain.example/static/widget.js"
+  src="https://your-domain.example/static/widget.js?v=RELEASE_ID"
   data-api-base="https://your-domain.example">
 </script>
 ```
@@ -78,12 +78,14 @@ synthesize an answer.
 
 ```html
 <script
-  src="https://your-domain.example/static/widget.js"
+  src="https://your-domain.example/static/widget.js?v=RELEASE_ID"
   data-api-base="https://your-domain.example">
 </script>
 ```
 
 Use `data-open="true"` to open the panel on page load.
+Replace `RELEASE_ID` on every deployment. The query string is also forwarded to
+`widget.css`, preventing a CDN or browser from mixing widget asset versions.
 
 For a different website origin, set:
 
@@ -179,7 +181,8 @@ separate directories. For each release:
    `widget.css`.
 3. Restart the service, then verify `/api/health`, `/api/config`, the two widget
    assets, and one real chat request through the public reverse proxy.
-4. Hard-refresh the host site so cached widget assets cannot hide a bad rollout.
+4. Update the widget script's `v` query parameter, then hard-refresh the host
+   site so cached assets cannot hide a bad rollout.
 
 Treat the configured `DOCS_DIR` as the canonical knowledge base. Add or replace
 documents there instead of editing generated index data. The service detects

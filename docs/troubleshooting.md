@@ -22,7 +22,8 @@ Verification checklist:
 3. `/api/config` returns HTTP 200.
 4. The browser console has no CSP or CORS error.
 5. The host page has a `<body>` when the widget script runs.
-6. A hard refresh loads the latest widget assets after deployment.
+6. The embed URL uses a new `?v=RELEASE_ID` value for each deployment.
+7. A hard refresh loads the latest widget assets after deployment.
 
 ## Deployment failed with "build timeout"
 
