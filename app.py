@@ -318,7 +318,17 @@ def favicon():
 
 @app.get("/robots.txt", include_in_schema=False)
 def robots():
-    return PlainTextResponse("User-agent: *\nDisallow: /api/\n")
+    return PlainTextResponse(
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /api/\n"
+        "Sitemap: https://bot.xyh.wiki/sitemap.xml\n"
+    )
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+def sitemap():
+    return FileResponse(BASE_DIR / "static" / "sitemap.xml", media_type="application/xml")
 
 
 @app.get("/")

@@ -20,3 +20,13 @@ def test_widget_respects_source_visibility_config():
 
     assert "showSources = cfg.show_sources !== false" in widget
     assert 'ev === "sources" && showSources' in widget
+
+
+def test_public_page_has_accurate_indexable_metadata():
+    page = (ROOT / "static" / "index.html").read_text(encoding="utf-8")
+
+    assert "RAG Support Bot Demo" in page
+    assert '<link rel="canonical" href="https://bot.xyh.wiki/">' in page
+    assert "98% match" not in page
+    assert "2.4s" not in page
+    assert (ROOT / "static" / "sitemap.xml").is_file()

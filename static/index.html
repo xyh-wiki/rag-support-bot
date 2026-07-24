@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Northwind Docs Hub</title>
-  <meta name="description" content="Ask your product knowledge base and get clear, grounded answers with citations.">
+  <title>RAG Support Bot Demo | Document Q&amp;A with Citations</title>
+  <meta name="description" content="Try the RAG Support Bot project: search a public sample knowledge base and inspect grounded answers with source citations.">
   <meta name="theme-color" content="#f4f2ed">
   <link rel="canonical" href="https://bot.xyh.wiki/">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
@@ -12,8 +12,8 @@
   <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
   <link rel="stylesheet" href="/static/home.css?v=20260721">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Northwind Docs Hub">
-  <meta property="og:description" content="Ask your product knowledge base and get clear, grounded answers with citations.">
+  <meta property="og:title" content="RAG Support Bot Demo">
+  <meta property="og:description" content="Search a public sample knowledge base and inspect grounded answers with source citations.">
   <meta property="og:url" content="https://bot.xyh.wiki/">
   <meta property="og:image" content="https://bot.xyh.wiki/static/apple-touch-icon.png">
   <meta name="twitter:card" content="summary">
@@ -25,7 +25,7 @@
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 32 32" fill="none"><path d="M9 8.5h14a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4h-6.4L11 27v-4.5H9a4 4 0 0 1-4-4v-6a4 4 0 0 1 4-4Z"/><path d="M11 14h10M11 18h6"/></svg>
         </span>
-        <span id="brand-name">Northwind Docs</span>
+        <span id="brand-name">RAG Support Bot</span>
       </a>
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="#capabilities" data-copy="navCapabilities">Capabilities</a>
@@ -57,7 +57,7 @@
           <div class="demo-topbar">
             <div class="demo-identity">
               <span class="demo-avatar"><span></span></span>
-              <div><strong id="demo-name">Northwind Assistant</strong><small><i></i><span data-copy="demoOnline">Online · Knowledge synced</span></small></div>
+              <div><strong id="demo-name">RAG Support Bot</strong><small><i></i><span data-copy="demoOnline">Online · Knowledge synced</span></small></div>
             </div>
             <span class="demo-menu" aria-hidden="true">•••</span>
           </div>
@@ -70,7 +70,7 @@
                 <div class="source-card">
                   <svg viewBox="0 0 20 20" fill="none"><path d="M5 3.5h7l3 3v10H5v-13Z"/><path d="M12 3.5v3h3M8 10h4M8 13h4"/></svg>
                   <div><span data-copy="demoSource">Source</span><strong data-copy="demoDocument">Getting started · Team management</strong></div>
-                  <span class="source-match" data-copy="demoMatch">98% match</span>
+                  <span class="source-match" data-copy="demoMatch">Grounded excerpt</span>
                 </div>
               </div>
             </div>
@@ -79,7 +79,7 @@
             <span data-copy="demoPlaceholder">Ask anything about the product…</span>
             <i><svg viewBox="0 0 20 20" fill="none"><path d="m17 3-6 14-2-6-6-2 14-6ZM9 11l8-8"/></svg></i>
           </button>
-          <span class="floating-note note-fast"><b>2.4s</b><small data-copy="noteResponse">average response</small></span>
+          <span class="floating-note note-fast"><b>SSE</b><small data-copy="noteResponse">streamed response</small></span>
           <span class="floating-note note-index"><b id="indexed-count">Live</b><small data-copy="noteIndexed">knowledge indexed</small></span>
         </div>
       </section>
@@ -141,7 +141,7 @@
       </section>
     </main>
 
-    <footer><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M9 8.5h14a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4h-6.4L11 27v-4.5H9a4 4 0 0 1-4-4v-6a4 4 0 0 1 4-4Z"/><path d="M11 14h10M11 18h6"/></svg></span><span id="footer-name">Northwind Docs</span></a><p data-copy="footerText">Reliable answers, grounded in your knowledge.</p><span>© <span id="year"></span></span></footer>
+    <footer><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M9 8.5h14a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4h-6.4L11 27v-4.5H9a4 4 0 0 1-4-4v-6a4 4 0 0 1 4-4Z"/><path d="M11 14h10M11 18h6"/></svg></span><span id="footer-name">RAG Support Bot</span></a><p data-copy="footerText">Reliable answers, grounded in your knowledge.</p><span>© <span id="year"></span></span></footer>
   </div>
   <noscript><p class="noscript">This page requires JavaScript. Please enable it and reload.</p></noscript>
   <script src="/static/home.js?v=20260721"></script>

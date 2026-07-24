@@ -10,7 +10,7 @@ from fastapi import HTTPException
 from starlette.requests import Request
 
 import app
-from app import _check_chat_origin, _source_only_answer, _stream_delta_content
+from app import _check_chat_origin, _source_only_answer, _stream_delta_content, robots, sitemap
 from rag.ingest import Chunk
 
 
@@ -109,3 +109,17 @@ def test_chat_origin_rejects_cross_site_fetch_metadata(monkeypatch):
         assert exc.status_code == 403
     else:
         raise AssertionError("cross-site fetch metadata was accepted")
+
+
+def test_robots_advertises_public_sitemap_and_blocks_api_crawling():
+    body = robots().body.decode()
+
+    assert "Disallow: /api/" in body
+    assert "Sitemap: https://bot.xyh.wiki/sitemap.xml" in body
+
+
+def test_sitemap_route_serves_the_static_xml_asset():
+    response = sitemap()
+
+    assert response.path.name == "sitemap.xml"
+    assert response.media_type == "application/xml"
