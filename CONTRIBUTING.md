@@ -5,6 +5,7 @@ Issues and pull requests are welcome. Keep changes small and easy to review.
 ## Local Checks
 
 ```bash
+python3 -m pip install -r requirements-dev.txt
 python3 -m pytest tests/ -q
 node --check static/widget.js
 ```
