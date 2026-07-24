@@ -1,0 +1,35 @@
+bot.xyh.wiki {
+	encode zstd gzip
+
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		Content-Security-Policy "default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	@document path / /robots.txt /sitemap.xml
+	header @document Cache-Control "no-cache"
+
+	@api path /api/*
+	header @api Cache-Control "no-store"
+
+	@immutable path /static/* /favicon.ico
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	log {
+		output file /data/logs/caddy/bot.xyh.wiki.access.log {
+			roll_size 50MiB
+			roll_keep 10
+			roll_keep_for 720h
+		}
+	}
+
+	reverse_proxy 127.0.0.1:8001 {
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+	}
+}

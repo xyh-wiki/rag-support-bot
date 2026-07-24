@@ -12,4 +12,8 @@ available.
   intended to be visible.
 - The chat endpoint is restricted to the service's own showcase origin. Do not
   add cross-origin access or publish it as an integration API.
+- Run the container as UID/GID `993:993`, keep the root filesystem read-only,
+  drop Linux capabilities, and bind the application port to loopback only.
+- Keep the standalone public showcase isolated from private support-bot
+  documents and credentials. Source-only mode is the safe default.
 - Rotate API keys if they appear in logs, screenshots, or issue reports.

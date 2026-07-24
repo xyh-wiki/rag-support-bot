@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Pin production dependencies and run the container as a non-root user with a
+  health check and reduced privileges.
+- Add an isolated `xyh-dep` deployment profile for `bot.xyh.wiki`.
+- Publish accurate project metadata, remove unsupported demo metrics, and add a
+  public XML sitemap.
+
 ## v0.1.0
 
 Initial public release.

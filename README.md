@@ -159,6 +159,12 @@ Docker files are included for deployment:
 - `docker-compose.yml`
 - `.dockerignore`
 
+The production image uses `requirements.lock`, runs as the non-root
+`993:993` user, and includes a health check. The standalone `xyh-dep` showcase
+is documented in `deploy/xyh-dep/README.md`; it uses a separate container and
+loopback port and must not reuse the existing support bot's private documents
+or credentials.
+
 ## License
 
 MIT

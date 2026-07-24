@@ -1,0 +1,26 @@
+name: rag-support-bot-showcase
+
+services:
+  showcase:
+    image: ${RAG_SUPPORT_BOT_IMAGE:?set RAG_SUPPORT_BOT_IMAGE to an immutable release tag}
+    container_name: rag-support-bot-showcase
+    restart: unless-stopped
+    user: "993:993"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "127.0.0.1:8001:8000"
+    env_file:
+      - ./showcase.env
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3).read()"]
+      interval: 15s
+      timeout: 5s
+      start_period: 15s
+      retries: 8
+    stop_grace_period: 20s

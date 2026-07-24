@@ -144,6 +144,10 @@ python3 -m pytest tests/test_widget_assets.py -q
 - `docker-compose.yml`
 - `.dockerignore`
 
+生产镜像使用 `requirements.lock`，以非 root 的 `993:993` 用户运行，并包含健康检查。
+`xyh-dep` 独立展示部署详见 `deploy/xyh-dep/README.md`；该部署必须使用单独容器和回环端口，
+不得复用现有支持 Bot 的私有文档或凭据。
+
 ## 许可证
 
 MIT
